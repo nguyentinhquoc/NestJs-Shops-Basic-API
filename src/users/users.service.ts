@@ -5,7 +5,6 @@ import { User } from './entities/user.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import * as bcrypt from 'bcryptjs'
-
 @Injectable()
 export class UsersService {
   constructor (
@@ -23,8 +22,7 @@ export class UsersService {
       if (!checkUser) {
         var salt = bcrypt.genSaltSync(10)
         var pashHash = bcrypt.hashSync(createUserDto.password, salt)
-        console.log(pashHash);
-
+        console.log(pashHash)
         const entity = this.usersRepository.create({
           email: createUserDto.email,
           user_name: createUserDto.user_name,
@@ -45,6 +43,19 @@ export class UsersService {
       console.log(error)
     }
   }
+  Login (createUserDto): Promise<User[]> {
+    return this.usersRepository.find()
+  }
+  async checkDataLogin (user_name: string, password: string) {
+    const userCheck = await this.usersRepository.findOne({
+      where: { user_name },
+    })
+    if (bcrypt.compareSync(password, userCheck.password)) {
+      return userCheck
+    }
+    return null
+  }
+
   findAll (): Promise<User[]> {
     return this.usersRepository.find()
   }
