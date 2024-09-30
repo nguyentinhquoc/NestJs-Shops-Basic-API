@@ -1,26 +1,84 @@
-import { Injectable } from '@nestjs/common';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
-
+import { Injectable, NotFoundException } from '@nestjs/common'
+import { CreateCategoryDto } from './dto/create-category.dto'
+import { UpdateCategoryDto } from './dto/update-category.dto'
+import { Category } from './entities/category.entity'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
 @Injectable()
 export class CategoriesService {
-  create(createCategoryDto: CreateCategoryDto) {
-    return 'This action adds a new category';
+  constructor (
+    @InjectRepository(Category)
+    private categoriesRepository: Repository<Category>,
+  ) {}
+
+  async restore (id: number) {
+    try {
+      await this.categoriesRepository.restore(id)
+      return { message: 'Khôi phục thành công' }
+    } catch (error) {
+      return {
+        error: error.message || error,
+      }
+    }
+  }
+  async create (createCategoryDto: CreateCategoryDto) {
+    try {
+      const newCategory = this.categoriesRepository.create(createCategoryDto)
+      const data = await this.categoriesRepository.save(newCategory)
+      return {
+        message: 'Thêm thành công',
+        data,
+      }
+    } catch (error) {
+      return {
+        error: error.message || error,
+      }
+    }
   }
 
-  findAll() {
-    return `This action returns all categories`;
+  findAll () {
+    try {
+      return this.categoriesRepository.find()
+    } catch (error) {
+      return {
+        error: error.message || error,
+      }
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} category`;
+  async findOne (id: number) {
+    try {
+      const category = await this.categoriesRepository.findOneBy({ id })
+      if (!category) {
+        throw new NotFoundException(`Category with ID ${id} not found`)
+      }
+      return category
+    } catch (error) {
+      return {
+        error: error.message || error,
+      }
+    }
   }
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return `This action updates a #${id} category`;
+  async update (id: number, updateCategoryDto: UpdateCategoryDto) {
+    try {
+      const category = await this.categoriesRepository.findOneBy({ id })
+      if (!category) {
+        throw new NotFoundException(`Category with ID ${id} not found`)
+      }
+      await this.categoriesRepository.update(id, updateCategoryDto)
+      return { message: 'Sửa thành công' }
+    } catch (error) {
+      return { error: error.message || error }
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} category`;
+  async remove (id: number) {
+    const category = await this.categoriesRepository.findOneBy({ id })
+    if (!category) {
+      throw new NotFoundException(`Category with ID ${id} not found`)
+    }
+    await this.categoriesRepository.softDelete(id)
+    return { message: 'Xóa thành công' }
   }
 }

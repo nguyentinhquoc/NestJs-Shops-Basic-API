@@ -22,7 +22,6 @@ export class UsersService {
       if (!checkUser) {
         var salt = bcrypt.genSaltSync(10)
         var pashHash = bcrypt.hashSync(createUserDto.password, salt)
-        console.log(pashHash)
         const entity = this.usersRepository.create({
           email: createUserDto.email,
           user_name: createUserDto.user_name,
@@ -39,12 +38,7 @@ export class UsersService {
           message: 'UserName hoặc Email đã tồn tại trên hệ thống',
         }
       }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-  Login (createUserDto): Promise<User[]> {
-    return this.usersRepository.find()
+    } catch (error) {}
   }
   async checkDataLogin (user_name: string, password: string) {
     const userCheck = await this.usersRepository.findOne({
@@ -55,18 +49,15 @@ export class UsersService {
     }
     return null
   }
-
   findAll (): Promise<User[]> {
     return this.usersRepository.find()
   }
   findOne (id: number) {
     return `This action returns a #${id} user`
   }
-
   update (id: number, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`
   }
-
   remove (id: number) {
     return `This action removes a #${id} user`
   }
