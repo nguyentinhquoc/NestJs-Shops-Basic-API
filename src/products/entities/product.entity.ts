@@ -12,43 +12,32 @@ import {
   DeleteDateColumn,
   ManyToOne,
   OneToMany
-
 } from 'typeorm'
 
 @Entity()
 export class Product {
   @PrimaryGeneratedColumn()
   id: number
-
   @ManyToOne(() => Category, Category => Category.id)
   category: number
-
   @Column()
   name: string
-
   @Column()
   stock: number
   @Column()
   price: number
-
   @Column()
-  description: number
-
+  description: string
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date
-
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date
-
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date
-
   @OneToMany(() => Review, Review => Review.id)
   Review: Review[]
-
   @OneToMany(() => Comment, Comment => Comment.id)
   Comment: Comment[]
-
   @OneToMany(() => Cart, Cart => Cart.id)
   Cart: Cart[]
   @OneToMany(() => OrderItem, OrderItem => OrderItem.id)
