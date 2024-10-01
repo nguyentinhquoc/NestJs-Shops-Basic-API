@@ -7,7 +7,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
-  ManyToMany,
   ManyToOne,
 } from 'typeorm'
 
@@ -15,24 +14,12 @@ import {
 export class Review {
   @PrimaryGeneratedColumn()
   id: number
+
   @Column()
   comment: string
 
-  @ManyToOne(
-    () => User,
-    User => {
-      User.id
-    },
-  )
-  user: number
-
-  @ManyToOne(
-    () => Product,
-    Product => {
-      Product.id
-    },
-  )
-  product: number
+  @Column()
+  star: number
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date
@@ -42,4 +29,9 @@ export class Review {
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date
+  @ManyToOne(() => User, user => user.review)
+  user: User
+
+  @ManyToOne(() => Product, product => product.review)
+  product: Product
 }

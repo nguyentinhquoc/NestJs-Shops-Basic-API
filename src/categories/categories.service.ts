@@ -62,8 +62,8 @@ export class CategoriesService {
 
   async update (id: number, updateCategoryDto: UpdateCategoryDto) {
     try {
-      const category = await this.categoriesRepository.findOneBy({ id })
-      if (!category) {
+      const check = await this.categoriesRepository.findOneBy({ id })
+      if (!check) {
         throw new NotFoundException(`Category with ID ${id} not found`)
       }
       await this.categoriesRepository.update(id, updateCategoryDto)
@@ -74,8 +74,8 @@ export class CategoriesService {
   }
 
   async remove (id: number) {
-    const category = await this.categoriesRepository.findOneBy({ id })
-    if (!category) {
+    const check = await this.categoriesRepository.findOneBy({ id })
+    if (!check) {
       throw new NotFoundException(`Category with ID ${id} not found`)
     }
     await this.categoriesRepository.softDelete(id)

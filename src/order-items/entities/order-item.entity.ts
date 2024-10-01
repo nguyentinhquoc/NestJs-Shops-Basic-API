@@ -18,23 +18,11 @@ export class OrderItem {
 
   @Column()
   quantity: number
-  @Column()
-  price: number
 
-  @ManyToOne(
-    () => Order,
-    Order => {
-      Order.id
-    },
-  )
+  @ManyToOne(() => Order, order => order.orderItem)
   order: number
 
-  @ManyToOne(
-    () => Product,
-    Product => {
-      Product.id
-    },
-  )
+  @ManyToOne(() => Product, Product => Product.orderItem)
   product: number
 
   @CreateDateColumn({ type: 'timestamp' })

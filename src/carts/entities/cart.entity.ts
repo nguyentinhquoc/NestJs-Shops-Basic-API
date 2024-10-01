@@ -14,10 +14,11 @@ import {
 export class Cart {
   @PrimaryGeneratedColumn()
   id: number
-  @ManyToOne(() => User, User => User.id)
+  @ManyToOne(() => User, User => User.cart)
   user: number
-  @ManyToOne(() => Product, Product => Product.id)
-  product: number
+  @ManyToOne(() => Product, Product => Product.cart)
+  product: Product
+
   @Column()
   quantity: number
 

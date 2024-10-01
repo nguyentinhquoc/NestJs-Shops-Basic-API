@@ -16,21 +16,6 @@ export class Comment {
   id: number
   @Column()
   content: string
-  @ManyToOne(
-    () => User,
-    User => {
-      User.id
-    },
-  )
-  user: number
-
-  @ManyToOne(
-    () => Product,
-    Product => {
-      Product.id
-    },
-  )
-  product: number
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date
@@ -40,4 +25,10 @@ export class Comment {
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date
+
+  @ManyToOne(() => Product, product => product.comment)
+  product: Product
+
+  @ManyToOne(() => User, user => user.comment)
+  user: User
 }

@@ -3,6 +3,7 @@ import { Category } from 'src/categories/entities/category.entity'
 import { Comment } from 'src/comments/entities/comment.entity'
 import { OrderItem } from 'src/order-items/entities/order-item.entity'
 import { Review } from 'src/reviews/entities/review.entity'
+import { User } from 'src/users/entities/user.entity'
 import {
   Entity,
   Column,
@@ -11,15 +12,12 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   ManyToOne,
-  OneToMany
+  OneToMany,
 } from 'typeorm'
-
 @Entity()
 export class Product {
   @PrimaryGeneratedColumn()
   id: number
-  @ManyToOne(() => Category, Category => Category.id)
-  category: number
   @Column()
   name: string
   @Column()
@@ -34,12 +32,14 @@ export class Product {
   updatedAt: Date
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date
-  @OneToMany(() => Review, Review => Review.id)
-  Review: Review[]
-  @OneToMany(() => Comment, Comment => Comment.id)
-  Comment: Comment[]
-  @OneToMany(() => Cart, Cart => Cart.id)
-  Cart: Cart[]
-  @OneToMany(() => OrderItem, OrderItem => OrderItem.id)
-  OrderItem: OrderItem[]
+  @ManyToOne(() => Category, category => category.product)
+  category: Category
+  @OneToMany(() => Comment, comment => comment.product)
+  comment: Comment[]
+  @OneToMany(() => Review, review => review.product)
+  review: Review[]
+  @OneToMany(() => Cart, Cart => Cart.product)
+  cart: Cart[]
+  @OneToMany(() => OrderItem, orderItem => orderItem.product)
+  orderItem: OrderItem[]
 }

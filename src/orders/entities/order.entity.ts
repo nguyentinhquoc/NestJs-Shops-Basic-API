@@ -1,3 +1,4 @@
+import { OrderStatus } from 'src/enum/orderStatus.enum'
 import { OrderItem } from 'src/order-items/entities/order-item.entity'
 import { User } from 'src/users/entities/user.entity'
 import {
@@ -10,7 +11,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-
 @Entity()
 export class Order {
   @PrimaryGeneratedColumn()
@@ -19,16 +19,21 @@ export class Order {
   @Column()
   total: number
 
-  @Column()
-  status: string
+  @Column({
+    type: 'enum',
+    enum: OrderStatus,
+    default: OrderStatus.PENDING,
+  })
+  statusOrder: OrderStatus
 
-  @ManyToOne(
-    () => User,
-    User => {
-      User.id
-    },
-  )
-  user: number
+  @Column()
+  phone: string
+
+  @Column()
+  address: string
+
+  @Column()
+  fullName: string
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date
@@ -38,6 +43,8 @@ export class Order {
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date
-    @OneToMany(() => OrderItem, OrderItem => OrderItem.id)
-  OrderItem: OrderItem[]
+  @OneToMany(() => OrderItem, OrderItem => OrderItem.id)
+  orderItem: OrderItem[]
+  @ManyToOne(() => User, user => user.order)
+  user: User
 }

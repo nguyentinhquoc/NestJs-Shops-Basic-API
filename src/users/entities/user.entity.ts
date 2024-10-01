@@ -29,12 +29,12 @@ export class User {
   updatedDate: Date
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date
-  @OneToMany(() => Review, Review => Review.id)
-  Review: Review[]
-  @OneToMany(() => Comment, Comment => Comment.id)
-  Comment: Comment[]
-  @OneToMany(() => Cart, Cart => Cart.id)
-  Cart: Cart[]
-  @OneToMany(() => Order, Order => Order.id)
-  Order: Order[]
+  @OneToMany(() => Review, review => review.user)
+  review: Review[]
+  @OneToMany(() => Comment, Comment => Comment.user)
+  comment: Comment[]
+  @OneToMany(() => Cart, Cart => Cart.user)
+  cart: Cart[]
+  @OneToMany(() => Order, Order => Order.user)
+  order: Order[]
 }

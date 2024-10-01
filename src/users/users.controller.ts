@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common'
 import { UsersService } from './users.service'
 import { CreateUserDto } from './dto/create-user.dto'
@@ -15,7 +16,7 @@ import { User } from 'src/decorater/User.decorator'
 import { Admin } from 'src/decorater/Admin.decorator'
 import { log } from 'console'
 
-@Controller('user')
+@Controller('users')
 export class UsersController {
   constructor (private readonly usersService: UsersService) {}
 
@@ -23,6 +24,10 @@ export class UsersController {
   @Post('/register')
   Register (@Body() createUserDto: CreateUserDto) {
     return this.usersService.Register(createUserDto)
+  }
+  @Get()
+  findAll (@Admin() req, @Query('page') page: number = 1) {
+    return this.usersService.findAll(page)
   }
   @Get(':id')
   findOne (@Param('id') id: string) {
@@ -35,7 +40,11 @@ export class UsersController {
   }
 
   @Delete(':id')
-  remove (@Param('id') id: string) {
+  remove (@Admin() req, @Param('id') id: string) {
     return this.usersService.remove(+id)
+  }
+  @Post('/restore/:id')
+  restore (@Admin() req, @Param('id') id: string) {
+    return this.usersService.restore(+id)
   }
 }

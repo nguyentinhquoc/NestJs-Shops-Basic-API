@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { User } from './entities/user.entity'
@@ -49,8 +49,17 @@ export class UsersService {
     }
     return null
   }
-  findAll (): Promise<User[]> {
-    return this.usersRepository.find()
+ async findAll (page: number) {
+    try {
+      return await this.usersRepository.find({
+        take: 10,
+        skip: (page - 1) * 10,
+      })
+    } catch (error) {
+      return {
+        error: error.message || error,
+      }
+    }
   }
   findOne (id: number) {
     return `This action returns a #${id} user`
@@ -58,7 +67,37 @@ export class UsersService {
   update (id: number, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`
   }
-  remove (id: number) {
-    return `This action removes a #${id} user`
+  async remove (id: number) {
+    try {
+      const dataCheck = await this.usersRepository.findOne({ where: { id } })
+      if (!dataCheck) {
+        throw new NotFoundException(`Not found`)
+      }
+      await this.usersRepository.softDelete(id)
+      return {
+        message: 'Deleted successfully',
+      }
+    } catch (error) {
+      return {
+        error: error.message || error,
+      }
+    }
+  }
+   async restore (id: number) {
+    try {
+      const dataCheck = await this.usersRepository.findOne({
+        where: { id },
+        withDeleted: true,
+      })
+      if (!dataCheck) {
+        throw new NotFoundException(`Not found`)
+      }
+      await this.usersRepository.restore(id)
+      return { message: 'Khôi phục thành công' }
+    } catch (error) {
+      return {
+        error: error.message || error,
+      }
+    }
   }
 }

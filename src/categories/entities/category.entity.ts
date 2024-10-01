@@ -8,23 +8,18 @@ import {
   CreateDateColumn,
   OneToMany,
 } from 'typeorm'
-
 @Entity()
 export class Category {
   @PrimaryGeneratedColumn()
   id: number
   @Column()
   name: string
-
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date
-
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date
-
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date
-
   @OneToMany(() => Product, product => product.category)
-  products: Product[]
+  product: Product[]
 }
