@@ -17,6 +17,7 @@ import { User } from 'src/decorater/User.decorator'
 import { CartsService } from 'src/carts/carts.service'
 import { OrderItemsService } from 'src/order-items/order-items.service'
 import { log } from 'console'
+import { OrderStatus } from 'src/enum/orderStatus.enum'
 
 @Controller('orders')
 export class OrdersController {
@@ -63,7 +64,7 @@ export class OrdersController {
   @Patch('/:id')
   async cancelOrder (@Param('id') id: number) {
     const dataOrder = await this.ordersService.findOneStatus(id)
-    if (dataOrder === 'PENDING') {
+    if (dataOrder === OrderStatus.PENDING) {
       return this.ordersService.cancelOrder(id)
     } else {
       return {
