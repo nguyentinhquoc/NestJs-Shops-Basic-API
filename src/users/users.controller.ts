@@ -12,7 +12,7 @@ import { UsersService } from './users.service'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { Public } from 'src/decorater/NoLogin.decorator'
-import { User } from 'src/decorater/User.decorator'
+import { AllUser } from 'src/decorater/AllUser.decorator'
 import { Admin } from 'src/decorater/Admin.decorator'
 import { log } from 'console'
 

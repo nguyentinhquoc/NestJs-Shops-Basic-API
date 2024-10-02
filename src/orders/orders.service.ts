@@ -7,6 +7,7 @@ import { Repository } from 'typeorm'
 import { OrderItem } from 'src/order-items/entities/order-item.entity'
 import { Cart } from 'src/carts/entities/cart.entity'
 import { OrderStatus } from 'src/enum/orderStatus.enum'
+import { relative } from 'path'
 
 @Injectable()
 export class OrdersService {
@@ -14,6 +15,20 @@ export class OrdersService {
     @InjectRepository(Order)
     private ordersRepository: Repository<Order>,
   ) {}
+
+  async findAll (page: number) {
+    try {
+      return await this.ordersRepository.find({
+        take: 10,
+        skip: (page - 1) * 10,
+        relations: ['orderItems'],
+      })
+    } catch (error) {
+      return {
+        error: error.message || error,
+      }
+    }
+  }
 
   async create (idUser, createOrderDto: CreateOrderDto) {
     try {
@@ -36,13 +51,13 @@ export class OrdersService {
     }
   }
 
-  async cancelOrder (id: number) {
+  async changeStatus (id: number, statusChange) {
     try {
       await this.ordersRepository.update(id, {
-        statusOrder: OrderStatus.CANCELLED,
+        statusOrder: statusChange,
       })
       return {
-        message: 'Cancel successfully',
+        message: 'change status successfully',
       }
     } catch (error) {
       return {
@@ -50,8 +65,20 @@ export class OrdersService {
       }
     }
   }
-  findAll () {
-    return `This action returns all orders`
+  async findAllWUser (idUser) {
+    try {
+      const dataCheck = await this.ordersRepository.find({
+        where: { user: idUser, statusOrder: OrderStatus.COMPLETED },
+      })
+      if (!dataCheck) {
+        throw new NotFoundException(`Not found`)
+      }
+      return dataCheck
+    } catch (error) {
+      return {
+        error: error.message || error,
+      }
+    }
   }
 
   async findOne (id: number) {
@@ -81,8 +108,38 @@ export class OrdersService {
     }
   }
 
-  update (id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`
+  async remove (id: number) {
+    try {
+      const dataCheck = await this.ordersRepository.findOne({ where: { id } })
+      if (!dataCheck) {
+        throw new NotFoundException(`Not found`)
+      }
+      await this.ordersRepository.softDelete(id)
+      return {
+        message: 'Deleted successfully',
+      }
+    } catch (error) {
+      return {
+        error: error.message || error,
+      }
+    }
+  }
+  async restore (id: number) {
+    try {
+      const dataCheck = await this.ordersRepository.findOne({
+        where: { id },
+        withDeleted: true,
+      })
+      if (!dataCheck) {
+        throw new NotFoundException(`Not found`)
+      }
+      await this.ordersRepository.restore(id)
+      return { message: 'Khôi phục thành công' }
+    } catch (error) {
+      return {
+        error: error.message || error,
+      }
+    }
   }
 
   async delete (id: number) {

@@ -1,23 +1,37 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateReviewDto } from './dto/create-review.dto';
-import { UpdateReviewDto } from './dto/update-review.dto';
-import { Review } from './entities/review.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Injectable, NotFoundException } from '@nestjs/common'
+import { CreateReviewDto } from './dto/create-review.dto'
+import { UpdateReviewDto } from './dto/update-review.dto'
+import { Review } from './entities/review.entity'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
 
 @Injectable()
 export class ReviewsService {
-
-    constructor (
+  constructor (
     @InjectRepository(Review)
     private reviewsRepository: Repository<Review>,
   ) {}
 
-  create(createReviewDto: CreateReviewDto) {
-    return 'This action adds a new review';
+  async create (IdUser,idProduct, createReviewDto: CreateReviewDto) {
+    try {
+      const data = await this.reviewsRepository.create({
+        product:idProduct,
+        user: IdUser,
+        ...createReviewDto,
+      })
+      await this.reviewsRepository.save(data)
+      return {
+        message: 'Created successfully',
+        data,
+      }
+    } catch (error) {
+      return {
+        error: error.message || error,
+      }
+    }
   }
 
- async findAll (page: number) {
+  async findAll (page: number) {
     try {
       return await this.reviewsRepository.find({
         take: 10,
@@ -30,15 +44,16 @@ export class ReviewsService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} review`;
+
+  findOne (id: number) {
+    return `This action returns a #${id} review`
   }
 
-  update(id: number, updateReviewDto: UpdateReviewDto) {
-    return `This action updates a #${id} review`;
+  update (id: number, updateReviewDto: UpdateReviewDto) {
+    return `This action updates a #${id} review`
   }
 
-   async remove (id: number) {
+  async remove (id: number) {
     try {
       const dataCheck = await this.reviewsRepository.findOne({ where: { id } })
       if (!dataCheck) {
@@ -54,7 +69,7 @@ export class ReviewsService {
       }
     }
   }
-   async restore (id: number) {
+  async restore (id: number) {
     try {
       const dataCheck = await this.reviewsRepository.findOne({
         where: { id },

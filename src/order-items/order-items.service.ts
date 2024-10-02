@@ -1,10 +1,9 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { CreateOrderItemDto } from './dto/create-order-item.dto'
 import { UpdateOrderItemDto } from './dto/update-order-item.dto'
 import { OrderItem } from './entities/order-item.entity'
 import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
-
 @Injectable()
 export class OrderItemsService {
   constructor (
@@ -32,9 +31,39 @@ export class OrderItemsService {
   findOne (id: number) {
     return `This action returns a #${id} orderItem`
   }
+  async checkCanReview (idProduct: number, idOrder: number) {
+    try {
+      const dataCheck = await this.orderItemsRepository.findOne({
+        where: {
+          product: { id: idProduct },
+          order: { id: idOrder },
+          review: false,
+        },
+      })
+      if (!dataCheck) {
+        throw new NotFoundException(`Not found`)
+      }
+      return dataCheck.id
+    } catch (error) {
+      return null
+    }
+  }
 
   update (id: number, updateOrderItemDto: UpdateOrderItemDto) {
     return `This action updates a #${id} orderItem`
+  }
+  async updateReview (id: number) {
+    try {
+      const result = await this.orderItemsRepository.update(id, {
+        review: true,
+      })
+      if (result.affected === 0) {
+        throw new NotFoundException(`Review with ID ${id} not found`)
+      }
+      return result
+    } catch (error) {
+      throw new Error(`Failed to update review: ${error.message}`)
+    }
   }
 
   remove (id: number) {

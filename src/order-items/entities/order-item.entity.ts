@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -18,12 +19,14 @@ export class OrderItem {
 
   @Column()
   quantity: number
+  @Column({ default: false })
+  review: boolean
 
-  @ManyToOne(() => Order, order => order.orderItem)
-  order: number
+  @ManyToOne(() => Order, order => order.orderItems)
+  order: Order
 
   @ManyToOne(() => Product, Product => Product.orderItem)
-  product: number
+  product: Product
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date

@@ -32,5 +32,5 @@ export class CreateOrderDto {
 
   @IsArray()
   @IsNotEmpty({ each: true })
-  idCart: number[]
+  idCart: number
 }

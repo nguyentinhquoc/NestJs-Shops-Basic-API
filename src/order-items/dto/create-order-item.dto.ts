@@ -1,11 +1,13 @@
 import { IsInt, IsNotEmpty, IsPositive, IsString } from 'class-validator'
 import { Type } from 'class-transformer'
+import { Product } from 'src/products/entities/product.entity'
+import { Order } from 'src/orders/entities/order.entity'
 
 export class CreateOrderItemDto {
   @IsNotEmpty()
   @IsInt()
   @Type(() => Number)
-  product: number
+  product: Product
 
   @IsNotEmpty()
   @IsInt()
@@ -15,5 +17,5 @@ export class CreateOrderItemDto {
 
   @IsNotEmpty()
   @IsInt()
-  order: number
+  order: Order
 }

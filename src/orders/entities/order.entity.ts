@@ -43,8 +43,8 @@ export class Order {
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date
-  @OneToMany(() => OrderItem, OrderItem => OrderItem.id)
-  orderItem: OrderItem[]
+  @OneToMany(() => OrderItem, orderItem => orderItem.order)
+    orderItems: OrderItem[];
   @ManyToOne(() => User, user => user.order)
   user: User
 }

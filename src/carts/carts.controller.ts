@@ -11,7 +11,7 @@ import {
 import { CartsService } from './carts.service'
 import { CreateCartDto } from './dto/create-cart.dto'
 import { UpdateCartDto } from './dto/update-cart.dto'
-import { User } from 'src/decorater/User.decorator'
+import { AllUser } from 'src/decorater/AllUser.decorator'
 
 @Controller('carts')
 export class CartsController {
@@ -19,7 +19,7 @@ export class CartsController {
 
   @Post('')
   create (
-    @User() req,
+    @AllUser() req,
     @Body() createCartDto: CreateCartDto,
   ) {
     return this.cartsService.create(req.user.id, createCartDto)

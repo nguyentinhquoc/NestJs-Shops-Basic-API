@@ -53,9 +53,7 @@ export class CartsService {
         product: cart.product.id,
       }
     } catch (error) {
-      return {
-        error: error.message || error,
-      }
+      return null
     }
   }
   update (id: number, updateCartDto: UpdateCartDto) {

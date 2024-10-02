@@ -1,4 +1,13 @@
-import { IsNotEmpty, IsNumber, IsString, Max, Min } from 'class-validator'
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator'
+import { Product } from 'src/products/entities/product.entity'
+import { User } from 'src/users/entities/user.entity'
 
 export class CreateReviewDto {
   @IsNotEmpty()
@@ -9,13 +18,5 @@ export class CreateReviewDto {
   @IsNumber()
   @Min(1)
   @Max(5)
-  start: number
-
-  @IsNotEmpty()
-  @IsNumber()
-  user: number
-
-  @IsNotEmpty()
-  @IsNumber()
-  product: number
+  star: number
 }
