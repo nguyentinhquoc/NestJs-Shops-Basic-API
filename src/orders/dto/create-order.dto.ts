@@ -6,6 +6,7 @@ import {
   IsPhoneNumber,
   IsArray,
   IsEnum,
+  IsBoolean,
 } from 'class-validator'
 import { OrderStatus } from 'src/enum/orderStatus.enum'
 
@@ -25,6 +26,11 @@ export class CreateOrderDto {
   @IsString()
   @IsNotEmpty()
   address: string
+
+
+
+  @IsBoolean()
+  payment: boolean
 
   @IsString()
   @IsNotEmpty()

@@ -35,6 +35,12 @@ export class Order {
   @Column()
   fullName: string
 
+  @Column()
+  payment: boolean
+
+  @Column()
+  orderId: string
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date
 
@@ -44,7 +50,7 @@ export class Order {
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date
   @OneToMany(() => OrderItem, orderItem => orderItem.order)
-    orderItems: OrderItem[];
+  orderItems: OrderItem[]
   @ManyToOne(() => User, user => user.order)
   user: User
 }

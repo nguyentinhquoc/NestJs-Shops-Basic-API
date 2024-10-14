@@ -20,6 +20,10 @@ import { ProductsService } from 'src/products/products.service'
 import { UsersService } from 'src/users/users.service'
 import { isArray } from 'class-validator'
 import { Admin } from 'src/decorater/Admin.decorator'
+import axios from 'axios'
+import { json } from 'stream/consumers'
+import { Public } from 'src/decorater/NoLogin.decorator'
+import { Order } from './entities/order.entity'
 
 @Controller('orders')
 export class OrdersController {
@@ -32,7 +36,7 @@ export class OrdersController {
   ) {}
 
   @Get()
-  findAll (@Admin() req,@Query('page') page: number = 1) {
+  findAll (@Admin() req, @Query('page') page: number = 1) {
     return this.ordersService.findAll(page)
   }
 
@@ -40,7 +44,9 @@ export class OrdersController {
   async create (@AllUser() req, @Body() createOrderDto: CreateOrderDto) {
     try {
       var checkActionOrder = true
+      var order_code = new Date().getTime()
       const OrderCreate = await this.ordersService.create(
+        order_code,
         req.user.id,
         createOrderDto,
       )
@@ -72,7 +78,6 @@ export class OrdersController {
               `Product with ID ${OrderCreate.data.id} not found`,
             )
           }
-
           const orderItem = await this.orderItemsService.create({
             product: DtProduct, // Truyền đối tượng Product
             quantity: dataCart.quantity,
@@ -81,8 +86,87 @@ export class OrdersController {
         }),
       )
       if (checkActionOrder) {
-        return {
-          message: 'Đặt hàng thành công successfully',
+        if (createOrderDto.payment == true) {
+          var accessKey = 'F8BBA842ECF85'
+          var secretKey = 'K951B6PE1waDMi640xX08PD3vg6EkVlz'
+          var orderInfo = 'pay with MoMo'
+          var partnerCode = 'MOMO'
+          var redirectUrl =
+            'https://2c41-123-24-142-220.ngrok-free.app/orders/payment'
+          var ipnUrl =
+            'https://2c41-123-24-142-220.ngrok-free.app/orders/payment'
+          var requestType = 'payWithMethod'
+          var amount = createOrderDto.total
+          var orderId = order_code
+          var requestId = orderId
+          var extraData = ''
+          var orderGroupId = ''
+          var autoCapture = true
+          var lang = 'vi'
+          var rawSignature =
+            'accessKey=' +
+            accessKey +
+            '&amount=' +
+            amount +
+            '&extraData=' +
+            extraData +
+            '&ipnUrl=' +
+            ipnUrl +
+            '&orderId=' +
+            orderId +
+            '&orderInfo=' +
+            orderInfo +
+            '&partnerCode=' +
+            partnerCode +
+            '&redirectUrl=' +
+            redirectUrl +
+            '&requestId=' +
+            requestId +
+            '&requestType=' +
+            requestType
+          console.log(rawSignature)
+          const crypto = require('crypto')
+          var signature = crypto
+            .createHmac('sha256', secretKey)
+            .update(rawSignature)
+            .digest('hex')
+          console.log(signature)
+          const requestBody = JSON.stringify({
+            partnerCode: partnerCode,
+            partnerName: 'Test',
+            storeId: 'MomoTestStore',
+            requestId: requestId,
+            amount: amount,
+            orderId: orderId,
+            orderInfo: orderInfo,
+            redirectUrl: redirectUrl,
+            ipnUrl: ipnUrl,
+            lang: lang,
+            requestType: requestType,
+            autoCapture: autoCapture,
+            extraData: extraData,
+            orderGroupId: orderGroupId,
+            signature: signature,
+          })
+          const options = {
+            url: 'https://test-payment.momo.vn/v2/gateway/api/create',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': Buffer.byteLength(requestBody),
+            },
+            data: requestBody,
+          }
+          try {
+            let result = await axios(options)
+            return result.data
+          } catch (err) {
+            return err
+          }
+        } else {
+          return {
+            message: 'Đặt hàng thành công successfully',
+          }
         }
       }
       return {
@@ -90,9 +174,17 @@ export class OrdersController {
       }
     } catch (error) {}
   }
+  @Public()
+  @Post('/payment')
+  async checkPaymentMomo (@Body() body) {
+    if (body.resultCode == 0) {
+      console.log(body.orderId)
+      return await this.ordersService.changePayment(body.orderId, true)
+    }
+  }
 
   @Patch('/cancelled/:id')
-  async cancelOrderChangeStatus (@Admin() req,@Param('id') id: number) {
+  async cancelOrderChangeStatus (@Admin() req, @Param('id') id: number) {
     const dataOrder = await this.ordersService.findOneStatus(id)
     if (dataOrder === OrderStatus.PENDING) {
       return this.ordersService.changeStatus(id, OrderStatus.CANCELLED)
@@ -103,7 +195,7 @@ export class OrdersController {
     }
   }
   @Patch('/completed/:id')
-  async completedOrderChangeStatus (@Admin() req,@Param('id') id: number) {
+  async completedOrderChangeStatus (@Admin() req, @Param('id') id: number) {
     const dataOrder = await this.ordersService.findOneStatus(id)
     if (
       dataOrder === OrderStatus.PENDING ||
@@ -117,7 +209,7 @@ export class OrdersController {
     }
   }
   @Patch('/processing/:id')
-  async processingOrderChangeStatus (@Admin() req,@Param('id') id: number) {
+  async processingOrderChangeStatus (@Admin() req, @Param('id') id: number) {
     const dataOrder = await this.ordersService.findOneStatus(id)
     if (dataOrder === OrderStatus.PENDING) {
       return this.ordersService.changeStatus(id, OrderStatus.PROCESSING)

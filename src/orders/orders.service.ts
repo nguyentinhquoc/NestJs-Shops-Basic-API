@@ -30,7 +30,7 @@ export class OrdersService {
     }
   }
 
-  async create (idUser, createOrderDto: CreateOrderDto) {
+  async create (order_code, idUser, createOrderDto: CreateOrderDto) {
     try {
       const data = await this.ordersRepository.create({
         total: createOrderDto.total,
@@ -38,6 +38,8 @@ export class OrdersService {
         address: createOrderDto.address,
         fullName: createOrderDto.fullName,
         user: idUser,
+        payment: false,
+        orderId: order_code,
       })
       await this.ordersRepository.save(data)
       return {
@@ -56,6 +58,21 @@ export class OrdersService {
       await this.ordersRepository.update(id, {
         statusOrder: statusChange,
       })
+      return {
+        message: 'change status successfully',
+      }
+    } catch (error) {
+      return {
+        error: error.message || error,
+      }
+    }
+  }
+  async changePayment (orderId: string, payment: boolean) {
+    try {
+      const result = await this.ordersRepository.update(
+        { orderId: orderId },
+        { payment: payment },
+      )
       return {
         message: 'change status successfully',
       }
