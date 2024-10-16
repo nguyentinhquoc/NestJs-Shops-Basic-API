@@ -8,10 +8,9 @@ import {
   Delete,
   NotFoundException,
   Query,
-} from '@nestjs/common'
+} from '@nestjs/common';
 import { OrdersService } from './orders.service'
 import { CreateOrderDto } from './dto/create-order.dto'
-import { UpdateOrderDto } from './dto/update-order.dto'
 import { AllUser } from 'src/decorater/AllUser.decorator'
 import { CartsService } from 'src/carts/carts.service'
 import { OrderItemsService } from 'src/order-items/order-items.service'
@@ -21,9 +20,8 @@ import { UsersService } from 'src/users/users.service'
 import { isArray } from 'class-validator'
 import { Admin } from 'src/decorater/Admin.decorator'
 import axios from 'axios'
-import { json } from 'stream/consumers'
 import { Public } from 'src/decorater/NoLogin.decorator'
-import { Order } from './entities/order.entity'
+import { ConfigService } from '@nestjs/config'
 
 @Controller('orders')
 export class OrdersController {
@@ -32,7 +30,6 @@ export class OrdersController {
     private readonly cartsService: CartsService,
     private readonly orderItemsService: OrderItemsService,
     private readonly productsService: ProductsService,
-    private readonly usersService: UsersService,
   ) {}
 
   @Get()
@@ -87,14 +84,15 @@ export class OrdersController {
       )
       if (checkActionOrder) {
         if (createOrderDto.payment == true) {
-          var accessKey = 'F8BBA842ECF85'
-          var secretKey = 'K951B6PE1waDMi640xX08PD3vg6EkVlz'
+          var accessKey = process.env.ACCESS_KEY
+          var secretKey = process.env.SECRET_KEY
+
           var orderInfo = 'pay with MoMo'
           var partnerCode = 'MOMO'
           var redirectUrl =
-            'https://2c41-123-24-142-220.ngrok-free.app/orders/payment'
+            'https://d1c9-113-190-253-172.ngrok-free.app/orders/payment'
           var ipnUrl =
-            'https://2c41-123-24-142-220.ngrok-free.app/orders/payment'
+            'https://d1c9-113-190-253-172.ngrok-free.app/orders/payment'
           var requestType = 'payWithMethod'
           var amount = createOrderDto.total
           var orderId = order_code
@@ -148,6 +146,7 @@ export class OrdersController {
             orderGroupId: orderGroupId,
             signature: signature,
           })
+          console.log(requestBody)
           const options = {
             url: 'https://test-payment.momo.vn/v2/gateway/api/create',
             method: 'POST',
@@ -174,12 +173,48 @@ export class OrdersController {
       }
     } catch (error) {}
   }
+
   @Public()
   @Post('/payment')
   async checkPaymentMomo (@Body() body) {
-    if (body.resultCode == 0) {
+    var accessKey = process.env.ACCESS_KEY
+    var secretKey = process.env.SECRET_KEY
+    const rawSignature =
+      'accessKey=' +
+      accessKey +
+      '&amount=' +
+      body.amount +
+      '&extraData=' +
+      body.extraData +
+      '&ipnUrl=' +
+      body.ipnUrl +
+      '&orderId=' +
+      body.orderId +
+      '&orderInfo=' +
+      body.orderInfo +
+      '&partnerCode=' +
+      body.partnerCode +
+      '&requestId=' +
+      body.requestId +
+      '&requestType=' +
+      body.requestType
+    const crypto = require('crypto')
+    const generatedSignature = crypto
+      .createHmac('sha256', secretKey)
+      .update(rawSignature)
+      .digest('hex')
+    if (body.signature !== generatedSignature) {
+      return {
+        message: 'THANH TOÁN THẤT BẠI',
+      }
+    }
+    if (body.resultCode === 0) {
       console.log(body.orderId)
       return await this.ordersService.changePayment(body.orderId, true)
+    } else {
+      return {
+        message: 'THANH TOÁN THẤT BẠI',
+      }
     }
   }
 
