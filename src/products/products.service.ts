@@ -72,7 +72,24 @@ export class ProductsService {
       }
     }
   }
-
+async updateStock (id: number, quantity: number) {
+    try {
+      const dataCheck = await this.prodcutsRepository.findOne({ where: { id } })
+      if (!dataCheck) {
+        throw new NotFoundException(`Not found`)
+      }
+      await this.prodcutsRepository.update(id, {
+        stock: dataCheck.stock - quantity,
+      })
+      return {
+        message: 'Edit successfully',
+      }
+    } catch (error) {
+      return {
+        error: error.message || error,
+      }
+    }
+  }
   async remove (id: number) {
     try {
       const dataCheck = await this.prodcutsRepository.findOne({ where: { id } })

@@ -8,7 +8,7 @@ import {
   Delete,
   NotFoundException,
   Query,
-} from '@nestjs/common';
+} from '@nestjs/common'
 import { OrdersService } from './orders.service'
 import { CreateOrderDto } from './dto/create-order.dto'
 import { AllUser } from 'src/decorater/AllUser.decorator'
@@ -55,6 +55,30 @@ export class OrdersController {
       } else {
         ArrIdCart.push(createOrderDto.idCart)
       }
+      const checkStock = await Promise.all(
+        ArrIdCart.map(async (id: number) => {
+          const dataCart = await this.cartsService.findOne(id)
+          if (!dataCart) {
+            await this.ordersService.delete(OrderCreate.data.id)
+            return false
+          }
+          const DtProduct = await this.productsService.findOne(dataCart.product)
+          if (
+            !DtProduct ||
+            'error' in DtProduct ||
+            DtProduct.stock < dataCart.quantity ||
+            DtProduct.stock <= 0
+          ) {
+            return false
+          }
+          return true
+        }),
+      )
+
+      if (checkStock.includes(false)) {
+        return 'Lỗi mặt hàng không đủ hoặc giỏ hàng không tồn tại'
+      }
+
       const actionOrder = await Promise.all(
         ArrIdCart.map(async (id: number) => {
           const dataCart = await this.cartsService.findOne(id)
@@ -80,6 +104,10 @@ export class OrdersController {
             quantity: dataCart.quantity,
             order: DtOrder,
           })
+          const updateStock = await this.productsService.updateStock(
+            DtProduct.id,
+            dataCart.quantity,
+          )
         }),
       )
       if (checkActionOrder) {
