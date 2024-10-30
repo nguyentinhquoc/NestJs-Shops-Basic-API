@@ -8,7 +8,7 @@ import {
   IsEnum,
   IsBoolean,
 } from 'class-validator'
-import { OrderStatus } from 'src/enum/orderStatus.enum'
+import { OrderStatus } from '../../enum/orderStatus.enum'
 
 export class CreateOrderDto {
   @IsNumber()
@@ -38,5 +38,5 @@ export class CreateOrderDto {
 
   @IsArray()
   @IsNotEmpty({ each: true })
-  idCart: number
+  idCart: number[]
 }

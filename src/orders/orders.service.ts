@@ -85,7 +85,7 @@ export class OrdersService {
   async findAllWUser (idUser) {
     try {
       const dataCheck = await this.ordersRepository.find({
-        where: { user: idUser, statusOrder: OrderStatus.COMPLETED },
+        where: { user: idUser },
       })
       if (!dataCheck) {
         throw new NotFoundException(`Not found`)

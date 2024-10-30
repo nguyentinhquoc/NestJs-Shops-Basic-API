@@ -9,18 +9,18 @@ import {
   NotFoundException,
   Query,
 } from '@nestjs/common'
-import { OrdersService } from './orders.service'
-import { CreateOrderDto } from './dto/create-order.dto'
-import { AllUser } from 'src/decorater/AllUser.decorator'
-import { CartsService } from 'src/carts/carts.service'
-import { OrderItemsService } from 'src/order-items/order-items.service'
-import { OrderStatus } from 'src/enum/orderStatus.enum'
-import { ProductsService } from 'src/products/products.service'
-import { UsersService } from 'src/users/users.service'
+import { OrdersService } from '../orders/orders.service'
+import { CreateOrderDto } from '../orders/dto/create-order.dto'
+import { AllUser } from '../decorater/AllUser.decorator'
+import { CartsService } from '../carts/carts.service'
+import { OrderItemsService } from '../order-items/order-items.service'
+import { OrderStatus } from '../enum/orderStatus.enum'
+import { ProductsService } from '../products/products.service'
+import { UsersService } from '../users/users.service'
 import { isArray } from 'class-validator'
-import { Admin } from 'src/decorater/Admin.decorator'
+import { Admin } from '../decorater/Admin.decorator'
 import axios from 'axios'
-import { Public } from 'src/decorater/NoLogin.decorator'
+import { Public } from '../decorater/NoLogin.decorator'
 import { ConfigService } from '@nestjs/config'
 
 @Controller('orders')
@@ -74,11 +74,9 @@ export class OrdersController {
           return true
         }),
       )
-
       if (checkStock.includes(false)) {
         return 'Lỗi mặt hàng không đủ hoặc giỏ hàng không tồn tại'
       }
-
       const actionOrder = await Promise.all(
         ArrIdCart.map(async (id: number) => {
           const dataCart = await this.cartsService.findOne(id)

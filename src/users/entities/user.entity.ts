@@ -1,7 +1,7 @@
-import { Cart } from 'src/carts/entities/cart.entity'
-import { Comment } from 'src/comments/entities/comment.entity'
-import { Order } from 'src/orders/entities/order.entity'
-import { Review } from 'src/reviews/entities/review.entity'
+import { Cart } from '../../carts/entities/cart.entity'
+import { Comment } from '../../comments/entities/comment.entity'
+import { Order } from '../../orders/entities/order.entity'
+import { Review } from '../../reviews/entities/review.entity'
 import {
   Entity,
   Column,

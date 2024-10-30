@@ -1,6 +1,6 @@
 import { OrderStatus } from 'src/enum/orderStatus.enum'
-import { OrderItem } from 'src/order-items/entities/order-item.entity'
-import { User } from 'src/users/entities/user.entity'
+import { OrderItem } from '../../order-items/entities/order-item.entity'
+import { User } from '../../users/entities/user.entity'
 import {
   Column,
   CreateDateColumn,
@@ -20,11 +20,9 @@ export class Order {
   total: number
 
   @Column({
-    type: 'enum',
-    enum: OrderStatus,
-    default: OrderStatus.PENDING,
+    default: "PENDING",
   })
-  statusOrder: OrderStatus
+  statusOrder: string
 
   @Column()
   phone: string

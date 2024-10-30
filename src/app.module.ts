@@ -25,6 +25,8 @@ import { AuthModule } from './auth/auth.module'
 import { ConfigModule } from '@nestjs/config'
 import { APP_GUARD } from '@nestjs/core'
 import { JwtAuthGuard } from './auth/jwt-auth.guard'
+import { TestModule } from './test/test.module';
+import { TestModule } from './test/test.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -58,6 +60,7 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard'
     OrderItemsModule,
     PostsModule,
     AuthModule,
+    TestModule,
   ],
   controllers: [AppController],
   providers: [

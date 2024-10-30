@@ -1,9 +1,9 @@
-import { Cart } from 'src/carts/entities/cart.entity'
-import { Category } from 'src/categories/entities/category.entity'
-import { Comment } from 'src/comments/entities/comment.entity'
-import { OrderItem } from 'src/order-items/entities/order-item.entity'
-import { Review } from 'src/reviews/entities/review.entity'
-import { User } from 'src/users/entities/user.entity'
+import { Cart } from '../../carts/entities/cart.entity'
+import { Category } from '../../categories/entities/category.entity'
+import { Comment } from '../../comments/entities/comment.entity'
+import { OrderItem } from '../../order-items/entities/order-item.entity'
+import { Review } from '../../reviews/entities/review.entity'
+import { User } from '../../users/entities/user.entity'
 import {
   Entity,
   Column,
