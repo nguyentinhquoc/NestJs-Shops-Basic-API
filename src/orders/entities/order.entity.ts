@@ -1,4 +1,4 @@
-import { OrderStatus } from 'src/enum/orderStatus.enum'
+import { OrderStatus } from '../../enum/orderStatus.enum'
 import { OrderItem } from '../../order-items/entities/order-item.entity'
 import { User } from '../../users/entities/user.entity'
 import {
@@ -20,9 +20,11 @@ export class Order {
   total: number
 
   @Column({
-    default: "PENDING",
+    type: 'enum',
+    enum: OrderStatus,
+    default: OrderStatus.PENDING,
   })
-  statusOrder: string
+  statusOrder: OrderStatus
 
   @Column()
   phone: string
@@ -47,8 +49,10 @@ export class Order {
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date
+
   @OneToMany(() => OrderItem, orderItem => orderItem.order)
   orderItems: OrderItem[]
+
   @ManyToOne(() => User, user => user.order)
   user: User
 }
